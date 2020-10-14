@@ -1,10 +1,11 @@
 from collections import namedtuple
+from enum import Enum
 import itertools
 
 
-# Satutus codes
-SUCCESS = 0
-WAIT_FOR_INPUT = 1
+class Status(Enum):
+    SUCCESS = 0
+    INPUT_REQUIRED = 1
 
 
 Param = namedtuple('Param', ['mode', 'value'])
@@ -124,17 +125,31 @@ class CompleteIntcodeComputer:
                 parameter.mode))
 
     def start(self, input):
+        """
+        |input| can be an int or an iterable.
+        """
         self._instruction_pointer = 0
         self._jumped = False
         self._relative_base = 0
         self._memory = self._program.copy()
-        self._input = input.copy()
+        if isinstance(input, int):
+            self._input = [input]
+        else:
+            self._input = input.copy()
         self._output = []
         status_code = self.run()
         return status_code, self._output
 
     def resume(self, additional_input):
-        self._input.extend(additional_input)
+        """
+        |additional_input| can be an int or an iterable.
+        """
+        if isinstance(additional_input, int):
+            self._input.append(additional_input)
+        else:
+            self._input.extend(additional_input)
+        # Only care about new output.
+        self._output = []
         status_code = self.run()
         return status_code, self._output
 
@@ -142,7 +157,7 @@ class CompleteIntcodeComputer:
         while True:
             instruction = self.read()
             if instruction == 99: # Halt
-                return SUCCESS
+                return Status.SUCCESS
             opcode, parameter_modes = self.parse_instruction(instruction)
 
             parameter_count = self.PARAMETER_COUNTS[opcode]
@@ -151,8 +166,8 @@ class CompleteIntcodeComputer:
 
             opcode_fn = getattr(self, "op{}".format(opcode))
             status_code = opcode_fn(parameters)
-            if status_code != SUCCESS:
-                # An opcode function which doesn't reutrn SUCCESS must not
+            if status_code != Status.SUCCESS:
+                # An opcode function which doesn't return SUCCESS must not
                 # modify any state so that the computer can be resumed.
                 return status_code
 
@@ -163,42 +178,42 @@ class CompleteIntcodeComputer:
         [p1, p2, p3] = parameters
         output = self.read_param(p1) + self.read_param(p2)
         self.write_to_param(p3, output)
-        return SUCCESS
+        return Status.SUCCESS
 
     # Mulitply
     def op2(self, parameters):
         [p1, p2, p3] = parameters
         output = self.read_param(p1) * self.read_param(p2)
         self.write_to_param(p3, output)
-        return SUCCESS
+        return Status.SUCCESS
 
     # Input
     def op3(self, parameters):
         if len(self._input) == 0:
-            return WAIT_FOR_INPUT
+            return Status.INPUT_REQUIRED
         [p1] = parameters
         self.write_to_param(p1, self._input.pop(0))
-        return SUCCESS
+        return Status.SUCCESS
 
     # Output
     def op4(self, parameters):
         [p1] = parameters
         self._output.append(self.read_param(p1))
-        return SUCCESS
+        return Status.SUCCESS
 
     # Jump if true
     def op5(self, parameters):
         [p1, p2] = parameters
         if self.read_param(p1) != 0:
             self.jump(self.read_param(p2))
-        return SUCCESS
+        return Status.SUCCESS
 
     # Jump if false
     def op6(self, parameters):
         [p1, p2] = parameters
         if self.read_param(p1) == 0:
             self.jump(self.read_param(p2))
-        return SUCCESS
+        return Status.SUCCESS
 
     # Less than
     def op7(self, parameters):
@@ -207,7 +222,7 @@ class CompleteIntcodeComputer:
             self.write_to_param(p3, 1)
         else:
             self.write_to_param(p3, 0)
-        return SUCCESS
+        return Status.SUCCESS
 
     # Equals
     def op8(self, parameters):
@@ -216,10 +231,10 @@ class CompleteIntcodeComputer:
             self.write_to_param(p3, 1)
         else:
             self.write_to_param(p3, 0)
-        return SUCCESS
+        return Status.SUCCESS
 
     # Adjust relative base
     def op9(self, parameters):
         [p1] = parameters
         self._relative_base += self.read_param(p1)
-        return SUCCESS
+        return Status.SUCCESS
