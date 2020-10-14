@@ -1,4 +1,4 @@
-with open("input.txt") as f:
+with open("01/input.txt") as f:
     data = f.readlines()
 
 masses = list(map(int, data))

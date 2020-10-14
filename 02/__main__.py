@@ -25,7 +25,7 @@ def run_intcode(program):
         instruction_pointer += 4
 
 
-with open("input.txt") as f:
+with open("02/input.txt") as f:
     input_program = list(map(int, f.readline().split(",")))
 
 

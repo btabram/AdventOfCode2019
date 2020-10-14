@@ -171,7 +171,7 @@ class IntcodeComputer:
             self.write_to_param(p3, 0)
 
 
-with open("input.txt") as f:
+with open("05/input.txt") as f:
     program = list(map(int, f.readline().split(",")))
 
 computer = IntcodeComputer()

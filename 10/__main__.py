@@ -64,7 +64,7 @@ class Asteroid:
                 self.in_LOS.append((x, y))
 
 
-with open("input.txt") as f:
+with open("10/input.txt") as f:
     grid = f.readlines()
 grid = [line.strip() for line in grid]
 

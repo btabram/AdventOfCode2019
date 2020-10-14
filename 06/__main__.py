@@ -16,7 +16,7 @@ class Body:
         self.jumps_to_com = jumps_to_com
 
 
-with open("input.txt") as f:
+with open("06/input.txt") as f:
     input = f.readlines()
 
 # Strip whitespace and validate input.

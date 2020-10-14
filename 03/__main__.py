@@ -57,7 +57,7 @@ class Wire(object):
                 self.distances[self.current_position] = self.distance_travelled
 
 
-with open("input.txt") as f:
+with open("03/input.txt") as f:
     wire_1 = Wire(map(Direction, f.readline().split(",")))
     wire_2 = Wire(map(Direction, f.readline().split(",")))
 

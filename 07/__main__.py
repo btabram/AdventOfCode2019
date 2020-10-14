@@ -199,7 +199,7 @@ class IntcodeComputer:
         return SUCCESS
 
 
-with open("input.txt") as f:
+with open("07/input.txt") as f:
     program = list(map(int, f.readline().split(",")))
 
 amp_a = IntcodeComputer(program)

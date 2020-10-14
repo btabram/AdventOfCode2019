@@ -1,7 +1,7 @@
 IMAGE_WIDTH = 25
 IMAGE_HEIGHT = 6
 
-with open("input.txt") as f:
+with open("08/input.txt") as f:
     encoded_image = list(map(int, [c for c in f.readline().strip()]))
 
 pixels_per_frame = IMAGE_WIDTH * IMAGE_HEIGHT

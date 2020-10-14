@@ -1,6 +1,6 @@
 from intcode_computer import CompleteIntcodeComputer
 
-with open("input.txt") as f:
+with open("09/input.txt") as f:
     program = list(map(int, f.readline().split(",")))
 
 computer = CompleteIntcodeComputer(program)
