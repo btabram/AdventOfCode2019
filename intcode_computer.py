@@ -124,7 +124,7 @@ class CompleteIntcodeComputer:
             raise Exception("Invalid parameter mode for writing: {}".format(
                 parameter.mode))
 
-    def start(self, input):
+    def start(self, input = None):
         """
         |input| can be an int or an iterable.
         """
@@ -132,7 +132,9 @@ class CompleteIntcodeComputer:
         self._jumped = False
         self._relative_base = 0
         self._memory = self._program.copy()
-        if isinstance(input, int):
+        if input is None:
+            self._input = []
+        elif isinstance(input, int):
             self._input = [input]
         else:
             self._input = input.copy()
