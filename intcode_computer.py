@@ -27,7 +27,7 @@ class CompleteIntcodeComputer:
         9: 1, # Adjust relative base
     }
 
-    def __init__(self, program):
+    def __init__(self, program, ascii = False):
         self._program = program
         self._instruction_pointer = 0
         self._jumped = False
@@ -35,6 +35,7 @@ class CompleteIntcodeComputer:
         self._memory = []
         self._input = []
         self._output = []
+        self._ascii = ascii
 
     def advance_to_next_instruction(self, parameter_count):
         if not self._jumped:
@@ -126,7 +127,7 @@ class CompleteIntcodeComputer:
 
     def start(self, input = None):
         """
-        |input| can be an int or an iterable.
+        |input| can be an int, iterable or string (if ascii is set).
         """
         self._instruction_pointer = 0
         self._jumped = False
@@ -136,23 +137,33 @@ class CompleteIntcodeComputer:
             self._input = []
         elif isinstance(input, int):
             self._input = [input]
+        elif self._ascii and isinstance(input, str):
+            self._input = [ord(c) for c in input]
         else:
             self._input = input.copy()
         self._output = []
         status_code = self.run()
+        # Output a string when configured, if the values are in the ascii range.
+        if self._ascii and all([0 < val < 128 for val in self._output]):
+            self._output = "".join(map(chr, self._output))
         return status_code, self._output
 
     def resume(self, additional_input):
         """
-        |additional_input| can be an int or an iterable.
+        |additional_input| can be an int, iterable or string (if ascii is set).
         """
         if isinstance(additional_input, int):
             self._input.append(additional_input)
+        elif self._ascii and isinstance(additional_input, str):
+            self._input.extend([ord(c) for c in additional_input])
         else:
             self._input.extend(additional_input)
         # Only care about new output.
         self._output = []
         status_code = self.run()
+        # Output a string when configured, if the values are in the ascii range.
+        if self._ascii and all([0 < val < 128 for val in self._output]):
+            self._output = "".join(map(chr, self._output))
         return status_code, self._output
 
     def run(self):
