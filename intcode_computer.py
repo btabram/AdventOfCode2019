@@ -1,6 +1,5 @@
 from collections import namedtuple
 from enum import Enum
-import itertools
 
 
 class Status(Enum):
